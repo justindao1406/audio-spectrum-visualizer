@@ -69,11 +69,13 @@ void i2s_setpin() {
 int mapLED(int row, int col) {
 	// return a position from continuous stirp order.
 	// Starting from bottom right, then left, then up, then right, then up, then left... etc
+
+	int orientated_col = 11 - col; // makes it so the lowest frequency is on the left side of the LED display
 	if (row % 2 == 0) { // even
-		return (row * 12 + col);
+		return (row * 12 + orientated_col);
 	}
 	else {
-		return (row * 12 + (11 - col));
+		return (row * 12 + (11 - orientated_col));
 	}
 }
 
@@ -104,10 +106,11 @@ void runFFT() {
 	// frequency range per column = 31 * 43.06 = 1334.86 Hz
 
 	constexpr int column_bin_size = 31;
-	float noiseFloor = 0.5;
 
 	// Finding peak amplitude for each LED column
 	for (int col = 0; col < COLUMNS; col++) {
+		float noiseFloor = 0.1;
+
 		int rowLevel = 0; // height
 
 		int startBin = col * column_bin_size + 1;
@@ -115,48 +118,88 @@ void runFFT() {
 
 		float peakMagnitude = 0; // for an interval of 31 bins
 
-    if (col == 0) { // Setting a higher noise floor for highest freq. since it picks up background noise (AC, fan, vibrations... etc)
-      noiseFloor = 1.9;
-    }
+		if (col == 0) { // Setting a higher noise floor for lowest freq. since it picks up background noise (AC, fan, vibrations... etc)
+		noiseFloor = 1.9;
+		}
 
 		for (int k = 0; k < column_bin_size; k++) {
 			if (vReal[startBin + k] > peakMagnitude) {
 				peakMagnitude = vReal[startBin + k];
 			}
 		}
-		if (peakMagnitude < noiseFloor) {
-			peakMagnitude = 0;
-			rowLevel = 0;
+
+		if (0 <= col && col <= 5) { // scaling for lower freq.
+			if (peakMagnitude < noiseFloor) {
+				peakMagnitude = 0;
+				rowLevel = 0;
+			}
+			else if (0.5 <= peakMagnitude && peakMagnitude < 1.2) {
+				rowLevel = 1;
+			}
+			else if (1.2 <= peakMagnitude && peakMagnitude < 2.3) {
+				rowLevel = 2;
+			}
+			else if (2.3 <= peakMagnitude && peakMagnitude < 3.9) {
+				rowLevel = 3;
+			}
+			else if (3.9 <= peakMagnitude && peakMagnitude < 6.2) {
+				rowLevel = 4;
+			}
+			else if (6.2 <= peakMagnitude && peakMagnitude < 9.4) {
+				rowLevel = 5;
+			}
+			else if (9.4 <= peakMagnitude && peakMagnitude < 13.6) {
+				rowLevel = 6;
+			}
+			else if (13.6 <= peakMagnitude && peakMagnitude < 19.0) {
+				rowLevel = 7;
+			}
+			else if (19.0 <= peakMagnitude && peakMagnitude < 26.0) {
+				rowLevel = 8;
+			}
+			else if (26.0 <= peakMagnitude && peakMagnitude < 31.7) {
+				rowLevel = 9;
+			}
+			else if (31.7 <= peakMagnitude) {
+				rowLevel = 10;
+			}
 		}
-		else if (0.5 <= peakMagnitude && peakMagnitude < 1.2) {
-			rowLevel = 1;
-		}
-		else if (1.2 <= peakMagnitude && peakMagnitude < 2.3) {
-			rowLevel = 2;
-		}
-		else if (2.3 <= peakMagnitude && peakMagnitude < 3.9) {
-			rowLevel = 3;
-		}
-		else if (3.9 <= peakMagnitude && peakMagnitude < 6.2) {
-			rowLevel = 4;
-		}
-		else if (6.2 <= peakMagnitude && peakMagnitude < 9.4) {
-			rowLevel = 5;
-		}
-		else if (9.4 <= peakMagnitude && peakMagnitude < 13.6) {
-			rowLevel = 6;
-		}
-		else if (13.6 <= peakMagnitude && peakMagnitude < 19.0) {
-			rowLevel = 7;
-		}
-		else if (19.0 <= peakMagnitude && peakMagnitude < 26.0) {
-			rowLevel = 8;
-		}
-		else if (26.0 <= peakMagnitude && peakMagnitude < 31.7) {
-			rowLevel = 9;
-		}
-		else if (31.7 <= peakMagnitude) {
-			rowLevel = 10;
+
+		else if (6 <= col && col <= 11) { // scaling for higher freq. (more sensitive to signal)
+			if (peakMagnitude < noiseFloor) {
+				peakMagnitude = 0;
+				rowLevel = 0;
+			}
+			else if (0.3 <= peakMagnitude && peakMagnitude < 0.8) {
+				rowLevel = 1;
+			}
+			else if (0.8 <= peakMagnitude && peakMagnitude < 1.6) {
+				rowLevel = 2;
+			}
+			else if (1.6 <= peakMagnitude && peakMagnitude < 2.7) {
+				rowLevel = 3;
+			}
+			else if (2.7 <= peakMagnitude && peakMagnitude < 4.3) {
+				rowLevel = 4;
+			}
+			else if (4.3 <= peakMagnitude && peakMagnitude < 6.6) {
+				rowLevel = 5;
+			}
+			else if (6.6 <= peakMagnitude && peakMagnitude < 9.5) {
+				rowLevel = 6;
+			}
+			else if (9.5 <= peakMagnitude && peakMagnitude < 13.3) {
+				rowLevel = 7;
+			}
+			else if (13.3 <= peakMagnitude && peakMagnitude < 18.2) {
+				rowLevel = 8;
+			}
+			else if (18.2 <= peakMagnitude && peakMagnitude < 22.2) {
+				rowLevel = 9;
+			}
+			else if (22.2 <= peakMagnitude) {
+				rowLevel = 10;
+			}
 		}
 
     int position = 0;
