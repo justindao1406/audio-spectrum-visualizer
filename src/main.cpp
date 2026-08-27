@@ -98,7 +98,7 @@ void runFFT() {
 	// Max frequency = 44100 / 2 = 22.05 kHz (using Nyquist Theorem)
 	// Adults max out their hearing ability on avg to 16 kHz
 
-	// Max freq / bin wdith = # of bins
+	// Max freq / bin width = # of bins
 	// 16 kHz / 44 Hz = 372 bins
 
 	// 372 bins / 12 columns = 31 bins per column
@@ -210,7 +210,7 @@ void runFFT() {
         leds[position] = 0xFF0000;
       }
       else if (12 <= position && position < 24) {
-        leds[position] = 0xFF7F00;
+        leds[position] = 0xFF4500;
       }
       else if (24 <= position && position < 36) {
         leds[position] = 0xFFFF00;
@@ -225,16 +225,16 @@ void runFFT() {
         leds[position] = 0x00FF7F;
       }
       else if (72 <= position && position < 84) {
-        leds[position] = 0x00FFFF;
-      }
-      else if (84 <= position && position < 96) {
         leds[position] = 0x007FFF;
       }
-      else if (96 <= position && position < 108) {
+      else if (84 <= position && position < 96) {
         leds[position] = 0x0000FF;
       }
-      else if (108 <= position) {
+      else if (96 <= position && position < 108) {
         leds[position] = 0x7F00FF;
+      }
+      else if (108 <= position) {
+        leds[position] = 0xFF00FF;
       }
 		}
 	}
