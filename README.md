@@ -14,6 +14,15 @@ A real-time audio spectrum visualizer that uses an ESP32 and INMP441 I²S microp
 - Suppresses background noise using configurable noise-floor thresholds
 - Successfully demonstrated real-time response to sounds and music
 
+<p align="center">
+  <img src="./docs/gifs/music_demo.gif" width="600"><br>
+  <em>Real-time music demonstration: the 12 LED columns visualize the detected frequency spectrum as the audio is processed.</em>
+</p>
+
+<p align="center">
+  <a href="./docs/videos/music_demo.mp4">▶ View full demonstration video</a>
+</p>
+
 ## Overview
 
 This project describes a real-time audio spectrum visualizer using an ESP32 as the microcontroller, INMP441 I²S as the microphone and a WS2812B as the LED display. The system uses the INMP441 microphone to continuously pick up audio data. It converts them into samples and the signal is processed using Fast Fourier Transform in the frequency domain. From the FFT, the various resulting frequency ranges are then converted into LED bar heights that respond to the audio that is being detected.
@@ -52,7 +61,7 @@ $$
 44100 \div 1024 = 43.1 \text{ Hz}
 $$
 
-Since the input signal is real-valued, the FFT output is symmetric and only the first half contains unique freq information. This means the useful freq. range extends from 0 Hz up to 22.05 kHz which satisfies the Nyquist theorem.
+Since the input signal is real-valued, the FFT output is symmetric and only the first half contains unique freq information. This means the useful freq. range extends from 0 Hz up to 22.05 kHz corresponding to the Nyquist frequency.
 
 Once FFT is calculated, the complex output is then converted to magnitude values where every FFT bin represents the strength of the audio signal within its small freq. range. Then, the magnitude values are used by the next step to group the spectrum into freq. bands which are represented by LED columns.
 
@@ -123,7 +132,7 @@ The ESP32 and INMP441 are able to communicate with one another using the I²S pr
 - INMP441 WS/LRCLK → GPIO21
 - INMP441 L/R → GND
 
-The microphone transmits its audio data through the left I²S channel since L/R pin is set to ground. There is no meaningful difference in audio quality whether the right channel or left channel is picked.
+The microphone transmits its audio data through the left I²S channel since L/R pin is set to ground.
 
 The WS2812B data input is connected and controlled by the GPIO4 pin on the ESP32. A 330 Ω resistor is placed in series with the LED data line to ensure stability. The LED strip receives 5 V from the external power supply while its ground is connected to the common ground shared with the ESP32 and the INMP441.
 
@@ -131,7 +140,7 @@ A 1000 µF capacitor is placed across the LED power supply's 5 V and ground conn
 
 The physical connections between the ESP32, microphone, LED strip and external power source are made using a breadboard and jumper wires. A simplified wiring diagram can be described as:
 
-(diagram pic)
+<img src="./docs/images/wiring_diagram.png" width="900">
 
 ### <u>Physical Layout and Assembly</u>
 
@@ -153,7 +162,7 @@ Tested the raw sample output from the INMP441 microphone and the I²S communicat
 
 The microphone was tested in a silent environment and then followed by several claps. During quiet periods, the signal remained close to the baseline. Each clap would produce clear amplitude spikes which confirmed that the ESP32 was successfully receiving audio samples from the INMP441 through the I²S protocol.
 
-![Silent to clapping INMP441 test](./docs/images/i2s_test.png)
+<img src="./docs/images/i2s_test.png" width="600">
 
 ### <u>Tone Frequency Test</u>
 
@@ -181,7 +190,10 @@ All 120 LEDs were illuminated successfully in both passes, thus confirming conti
 
 The test also used the same row colors as the final display visualizer, allowing the proper rainbow color progression to be checked at the same time.
 
-(gif here)
+<p align="center">
+  <img src="./docs/gifs/led_continuity.gif" width="600"><br>
+  <em>LED continuity demonstration: all 120 LEDs are illuminated sequentially in both directions to verify the complete LED chain.</em>
+</p>
 
 ### <u>Silence and Response Test</u>
 
@@ -189,7 +201,14 @@ The completed visualizer was tested in a quiet environment to verify the configu
 
 Then claps were done intermittently to produce an immediate response from the LED display. After the sound ended, the matrix would return to an inactive state. This confirmed that the noise floor suppresses background noise while the display still reacts quickly to intentional audio cues.
 
-(gif here)
+<p align="center">
+  <img src="./docs/gifs/clap_response.gif" width="600"><br>
+  <em>Silence and response demonstration: the display remains inactive during silence and responds immediately to claps before returning to the inactive state.</em>
+</p>
+
+<p align="center">
+  <a href="./docs/videos/clap_response.mp4">▶ View full silence and response video</a>
+</p>
 
 ## How to Run
 
